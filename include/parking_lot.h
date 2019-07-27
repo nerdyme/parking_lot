@@ -26,7 +26,7 @@ class ParkingLot {
 
         std::map< int, std::string> alloted_slot_to_reg;  //Take it as map as we need the status of each slot in sorted order
         std::unordered_map <std::string, carinfo> reg_to_carinfo;
-        std::unordered_map <std::string, std::unordered_map<int, std::string> > color_to_vinfo; //vinfo is map of slot to reg_num
+        std::unordered_map <std::string, std::map<int, std::string> > color_to_vinfo; //vinfo is map of slot to reg_num
 
         //Make the constructor private so that only one parking lot 
         //will be created that will be through the static function declared in public section
@@ -133,7 +133,7 @@ class ParkingLot {
 			empty_lots.pop();
 			alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
 			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));  //can use std::move to move carinfo object
-			//color_to_vinfo.emplace(std::make_pair(color, std::make_pair(allot_slot, reg_num))); //todo
+			color_to_vinfo[color][allot_slot] = reg_num; //todo
 
 			std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;
 			
@@ -150,22 +150,24 @@ class ParkingLot {
 
 			} else {
 				std::cout<<"Not found" <<std::endl;
-
 			}
 
 		}
 
 		void slot_nums_with_color(std::string color) {
 
+			std::string out="";
 			auto vinfo_ite = color_to_vinfo.find(color);
 			if (vinfo_ite == color_to_vinfo.end()) {
 				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
 				return;
 			}
 
-			/*for(auto vinfo : vinfo_ite) {
-					std::cout << vinfo->first <<" ";
-			}*/
+			for(const auto &vinfo : vinfo_ite->second) {
+					out += std::to_string(vinfo.first) + std::string(",");
+			}
+
+			std::cout<<out<<std::endl;
 
 		}
 
