@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include "abstract_input.h"
 
 
 void usage(char *binary) {

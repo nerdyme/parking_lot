@@ -12,6 +12,9 @@ private :
 	ParkingLot parking_lot{nullptr};
 
 public :
+
+	virtual ~AbstractInput() {} //Destructor of base class should be made virtual
+
 	void verifyCommand(std::string input) {
 		using namespace std;
 		vector <string> tokens; 
@@ -45,7 +48,7 @@ public :
 				exit(EXIT_FAILURE);
 			} 
 			int noOfParkingSlots = stoi(tokens[1]);
-			parking_lot = ParkingLot.createParkingLot(noOfPrakingSlots);
+			parking_lot = ParkingLot.createParkingLot(noOfParkingSlots);
 			break;
 
 	    } else if (command.equals("park")) {  //Park
@@ -83,7 +86,7 @@ public :
 			}
 			break;
 
-	    } else if (command.equals("status")) {
+	    } else if (command.equals("status")) {    //Status
 
 	    	if(cmd_args != 1) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
