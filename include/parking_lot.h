@@ -1,201 +1,205 @@
-#pragma once
+	#pragma once
 
-#include <unordered_map>
-#include <map>
-#include <queue>
+	#include <unordered_map>
+	#include <map>
+	#include <queue>
 
-struct carinfo {
-        std::string registration_no;
-        std::string color;
-        int slot;
+	struct carinfo {
+	        std::string registration_no;
+	        std::string color;
+	        int slot;
 
-        carinfo()=delete;
-        carinfo(std::string registration_no, std::string color, int slot ) :
-        registration_no(registration_no), color(color), slot(slot) {}
-    };
+	        carinfo()=delete;
+	        carinfo(std::string registration_no, std::string color, int slot ) :
+	        registration_no(registration_no), color(color), slot(slot) {}
+	    };
 
-class ParkingLot {
+	class ParkingLot {
 
-        private:
+	        private:
 
-        	const int lot_size{0};
-        	static ParkingLot *parking_lot;
+	        	const int lot_size{0};
+	        	static ParkingLot *parking_lot;
 
-        //Create a min heap for empty parking lots 
-        std::priority_queue <int, std::vector<int>, std::greater<int> > empty_lots;
+	        //Create a min heap for empty parking lots 
+	        std::priority_queue <int, std::vector<int>, std::greater<int> > empty_lots;
 
-        std::map< int, std::string> alloted_slot_to_reg;  //Take it as map as we need the status of each slot in sorted order
-        std::unordered_map <std::string, carinfo> reg_to_carinfo;
-        std::unordered_map <std::string, std::map<int, std::string> > color_to_vinfo; //vinfo is map of slot to reg_num
+	        std::map< int, std::string> alloted_slot_to_reg;  //Take it as map as we need the status of each slot in sorted order
+	        std::unordered_map <std::string, carinfo> reg_to_carinfo;
+	        std::unordered_map <std::string, std::map<int, std::string> > color_to_vinfo; //vinfo is map of slot to reg_num
 
-        //Make the constructor private so that only one parking lot 
-        //will be created that will be through the static function declared in public section
-        ParkingLot(int lot_size = 0) : lot_size(lot_size) {
+	        //Make the constructor private so that only one parking lot 
+	        //will be created that will be through the static function declared in public section
+	        //called by the wrapper abstract_input.h
+	        ParkingLot(int lot_size = 0) : lot_size(lot_size) {
 
-        	for(int i=1; i <=lot_size; ++i)
-        		empty_lots.push(i);   //All lots are empty initially
+	        	for(int i=1; i <=lot_size; ++i)
+	        		empty_lots.push(i);   //All lots are empty initially
 
-        	std::cout << "Created a parking lot with "<< lot_size <<" slots" << std::endl;
+	        	std::cout << "Created a parking lot with "<< lot_size <<" slots" << std::endl;
 
-        }
+	        }
 
-      public:
-        
-        
+	      public:
+	        
+	        
 
-        static ParkingLot* createParkingLot(int noOfParkingSlots) {
-			if(parking_lot != NULL) {
-				return parking_lot;
-			} else {
-				parking_lot = 
-						new ParkingLot(noOfParkingSlots);
-				return parking_lot;
+	        static ParkingLot* createParkingLot(int noOfParkingSlots) {
+				if(parking_lot != NULL) {
+					return parking_lot;
+				} else {
+					parking_lot = 
+							new ParkingLot(noOfParkingSlots);
+					return parking_lot;
+				}
+
 			}
 
-		}
+			//Functionalities required
 
-		//Functionalities required
+			void status() {
 
-		void status() {
+				if (lot_size == 0) {
+					std::cout << "Sorry, parking lot is not created" << std::endl;
 
-			if (lot_size == 0) {
-				std::cout << "Sorry, parking lot is not created" << std::endl;
+				} else if (alloted_slot_to_reg.size() > 0) {
+					std::cout << "Slot No.\tRegistration No.\tColor"<<std::endl;
+					
+					for(const auto reg_num : alloted_slot_to_reg) {
 
-			} else if (alloted_slot_to_reg.size() > 0) {
-				std::cout << "Slot No.\tRegistration No.\tColor"<<std::endl;
-				
-				for(const auto reg_num : alloted_slot_to_reg) {
+						auto reg_ite = reg_to_carinfo.find(reg_num.second);
+						if(reg_ite == reg_to_carinfo.end()) {
+							std::cout << "Something wrong/inconsistent in data structures used" <<std::endl; //debugging
+							return;
+						}
 
-					auto reg_ite = reg_to_carinfo.find(reg_num.second);
-					if(reg_ite == reg_to_carinfo.end()) {
-						std::cout << "Something wrong/inconsistent in data structures used" <<std::endl; //debugging
+						std::cout<<reg_ite->second.slot<<'\t' << reg_ite->second.registration_no
+						 << '\t' << reg_ite->second.color<< std::endl;
+					}
+					
+				} else {
+					std::cout << "Parking lot is empty" << std::endl;
+				}
+
+			}
+
+			void leave(int slot) {
+
+				auto reg_ite = alloted_slot_to_reg.find(slot);
+				if (reg_ite == alloted_slot_to_reg.end()) {
+					std::cout << "No Car is not present at slot " << slot << std::endl;
+					return;
+
+				} else {
+
+					auto carinfo_ite = reg_to_carinfo.find(reg_ite->second);
+					if(carinfo_ite == reg_to_carinfo.end()) {
+						std::cout<< " Something is wrong/inconsistent in the parking lot data you have" << std::endl; //debugging
 						return;
 					}
 
-					std::cout<<reg_ite->second.slot<<'\t' << reg_ite->second.registration_no << '\t' << reg_ite->second.color<< std::endl;
+					const auto carinfo_val = carinfo_ite->second;
+
+					
+					alloted_slot_to_reg.erase(reg_ite);
+					reg_to_carinfo.erase(carinfo_ite);
+					empty_lots.push(slot);
+					color_to_vinfo[carinfo_val.color].erase(slot);
+
+					if(color_to_vinfo.find(carinfo_val.color) != color_to_vinfo.end() && 
+						color_to_vinfo.find(carinfo_val.color)->second.size() == 0)
+						color_to_vinfo.erase(carinfo_val.color);
+
+					std::cout<<"Slot number "<<slot<<" is free"<<std::endl;
 				}
 				
-			} else {
-				std::cout << "Parking lot is empty" << std::endl;
+
 			}
 
-		}
+			void park(const std::string& reg_num, const std::string& color) {
 
-		void leave(int slot) {
+				if (lot_size == 0) {
+					std::cout<< " No Parking Lot is created, First create the parking lot space "<<std::endl;
+					return;
 
-			auto reg_ite = alloted_slot_to_reg.find(slot);
-			std::string reg_no;
-			if (reg_ite == alloted_slot_to_reg.end()) {
-				std::cout << "No Car is not present at slot " << slot << std::endl;
-				return;
+				}
 
-			} else {
-				std::string reg_num = reg_ite->second;
-
-				alloted_slot_to_reg.erase(reg_ite);
-
-				auto carinfo_ite = reg_to_carinfo.find(reg_num);
-				if(carinfo_ite == reg_to_carinfo.end()) {
-					std::cout<< " Something is wrong/inconsistent in the parking lot data you have" << std::endl; //debugging
+				if(empty_lots.size() == 0) {
+					std::cout<< "Sorry, parking lot is full"<<std::endl;
 					return;
 				}
 
-				const auto carinf = carinfo_ite->second;
+				int allot_slot = empty_lots.top(); //Will always give minimum available slot as it is priority queue implemented with min heap
+				empty_lots.pop();
+				alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
+				reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));
+				color_to_vinfo[color][allot_slot] = reg_num;
 
-				
-				//todo - erase from color_to_vinfo
-				color_to_vinfo[carinf.color].erase(slot);
-
-
-				reg_to_carinfo.erase(carinfo_ite);
-				empty_lots.push(slot);
-
-				std::cout<<"Slot number "<<slot<<" is free"<<std::endl;
+				std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;
 			}
-			
 
-		}
+			void slot_num_for_reg_num(const std::string& reg_num) const {
 
-		void park(const std::string& reg_num, const std::string& color) {
+				auto car_ite = reg_to_carinfo.find(reg_num);
+				if(car_ite != reg_to_carinfo.end()) {
 
-			if (lot_size == 0) {
-				std::cout<< " No Parking Lot is created, First create the parking lot space "<<std::endl;
-				return;
+					std::cout << car_ite->second.slot << std::endl;
+
+				} else {
+					std::cout<<"Not found" <<std::endl;
+				}
 
 			}
 
-			if(empty_lots.size() == 0) {
-				std::cout<< "Sorry, parking lot is full"<<std::endl;
-				return;
+			void slot_nums_with_color(std::string color) const {
+
+				std::string out="";
+				auto vinfo_ite = color_to_vinfo.find(color);
+				if (vinfo_ite == color_to_vinfo.end()) {
+					std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
+					return;
+				}
+
+				for(const auto &vinfo : vinfo_ite->second) {
+						out += std::to_string(vinfo.first) + std::string(", ");
+				}
+
+				out.pop_back();
+				out.pop_back();
+				std::cout << out <<std::endl;
 			}
 
-			int allot_slot = empty_lots.top(); //Will always give minimum available slot as it is priority queue implemented using heaps
-			empty_lots.pop();
-			alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
-			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));
-			color_to_vinfo[color][allot_slot] = reg_num; //todo
+			void reg_nums_with_color(std::string color) const {
 
-			std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;
-		}
+				std::string out="";
+				auto vinfo_ite = color_to_vinfo.find(color);
+				if (vinfo_ite == color_to_vinfo.end()) {
+					std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
+					return;
+				}
 
-		void slot_num_for_reg_num(const std::string& reg_num) const {
+				for(const auto &vinfo : vinfo_ite->second) {
+						out += vinfo.second + std::string(", ");
+				}
 
-			auto car_ite = reg_to_carinfo.find(reg_num);
-			if(car_ite != reg_to_carinfo.end()) {
-
-				std::cout << car_ite->second.slot << std::endl;
-
-			} else {
-				std::cout<<"Not found" <<std::endl;
-			}
-
-		}
-
-		void slot_nums_with_color(std::string color) const {
-
-			std::string out="";
-			auto vinfo_ite = color_to_vinfo.find(color);
-			if (vinfo_ite == color_to_vinfo.end()) {
-				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
-				return;
-			}
-
-			for(const auto &vinfo : vinfo_ite->second) {
-					out += std::to_string(vinfo.first) + std::string(", ");
-			}
-
-			out.pop_back();
-			out.pop_back();
-			std::cout<<out<<std::endl;
-		}
-
-		void reg_nums_with_color(std::string color) const {
-
-			std::string out="";
-			auto vinfo_ite = color_to_vinfo.find(color);
-			if (vinfo_ite == color_to_vinfo.end()) {
-				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
-				return;
-			}
-
-			for(const auto &vinfo : vinfo_ite->second) {
-					out += vinfo.second + std::string(", ");
-			}
-
-			out.pop_back();
-			out.pop_back();
-			std::cout<<out<<std::endl;
-		 }
+				out.pop_back();
+				out.pop_back();
+				std::cout << out <<std::endl;
+			 }
 
 
-		 ~ParkingLot() {
+			 ~ParkingLot() {
 
-		 	//CLear all the dynamic memory allocated space
-		 	alloted_slot_to_reg.clear();
-        	reg_to_carinfo.clear();
-       		color_to_vinfo.clear();
-		 }
-    };
+			 	//CLear all the dynamic memory allocated space
+			 	alloted_slot_to_reg.clear();
+	        	reg_to_carinfo.clear();
 
-//Definition of static data member
-ParkingLot *ParkingLot::parking_lot = nullptr;
+	        	for (auto vinfo : color_to_vinfo) {
+	        		vinfo.second.clear();  //First clear internal map corresponding to each color
+	        	}
+	       			color_to_vinfo.clear();
+			 }
+	    };
+
+	//Definition of static data member
+	ParkingLot *ParkingLot::parking_lot = nullptr;

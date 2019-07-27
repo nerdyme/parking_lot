@@ -13,8 +13,8 @@ public :
 		std::string line;
 		while (std::getline(std::cin, line)) {
 			verifyCommand(line);
-		}
+		    }
 
-	}
+		}
 
 };
