@@ -132,16 +132,13 @@ class ParkingLot {
 			int allot_slot = empty_lots.top(); //Will always give minimum available slot as it is priority queue implemented using heaps
 			empty_lots.pop();
 			alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
-			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));  //can use std::move to move carinfo object
+			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));
 			color_to_vinfo[color][allot_slot] = reg_num; //todo
 
 			std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;
-			
-
-
 		}
 
-		void slot_num_for_reg_num(const std::string& reg_num) {
+		void slot_num_for_reg_num(const std::string& reg_num) const {
 
 			auto car_ite = reg_to_carinfo.find(reg_num);
 			if(car_ite != reg_to_carinfo.end()) {
@@ -154,7 +151,7 @@ class ParkingLot {
 
 		}
 
-		void slot_nums_with_color(std::string color) {
+		void slot_nums_with_color(std::string color) const {
 
 			std::string out="";
 			auto vinfo_ite = color_to_vinfo.find(color);
@@ -164,21 +161,30 @@ class ParkingLot {
 			}
 
 			for(const auto &vinfo : vinfo_ite->second) {
-					out += std::to_string(vinfo.first) + std::string(",");
+					out += std::to_string(vinfo.first) + std::string(", ");
 			}
 
+			out.pop_back();
+			out.pop_back();
 			std::cout<<out<<std::endl;
-
 		}
 
-		void reg_nums_with_color(std::string color) {
+		void reg_nums_with_color(std::string color) const {
+
+			std::string out="";
 			auto vinfo_ite = color_to_vinfo.find(color);
 			if (vinfo_ite == color_to_vinfo.end()) {
 				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
 				return;
 			}
 
+			for(const auto &vinfo : vinfo_ite->second) {
+					out += vinfo.second + std::string(", ");
+			}
 
+			out.pop_back();
+			out.pop_back();
+			std::cout<<out<<std::endl;
 		 }
 
 
@@ -189,9 +195,6 @@ class ParkingLot {
         	reg_to_carinfo.clear();
        		color_to_vinfo.clear();
 		 }
-
-
-
     };
 
 //Definition of static data member
