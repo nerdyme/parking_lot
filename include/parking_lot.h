@@ -132,7 +132,7 @@
 				int allot_slot = empty_lots.top(); //Will always give minimum available slot as it is priority queue implemented with min heap
 				empty_lots.pop();
 				alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
-				reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));
+				reg_to_carinfo.emplace(std::make_pair(reg_num, carinfo(reg_num, color, allot_slot)));
 				color_to_vinfo[color][allot_slot] = reg_num;
 
 				std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;

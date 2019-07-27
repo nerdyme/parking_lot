@@ -19,9 +19,7 @@
 		void verifyCommand(std::string input) {
 			
 			std::vector<std::string> tokens; 
-	      
 		    std::istringstream ss(input); 
-		      
 		    std::string intermediate; 
 		      
 		    // Tokenizing w.r.t. space ' ' 
