@@ -1,14 +1,15 @@
 #include <iostream>
 #include <cstdio>
 #include "abstract_input.h"
+#include "command_input.h"
+#include "file_input.h"
 
 
 void usage(char *binary) {
 
 	std::cout<<" Usage in command mode requires only binary file\n " 
 	<< binary <<'\n';
-	std::cout  << " Usage in file mode requires binary file and 1 
-	argument with input file name \n" << binary << "  " << "<input_file>" <<'\n';
+	std::cout  << " Usage in file mode requires binary file and 1 argument with input file name \n" << binary << "  " << "<input_file>" <<'\n';
 
 }
 
@@ -34,7 +35,7 @@ if(argc == 1) { //Command Mode
 }
 
 
-input.read();
+input->read();
 
 return 1;
 

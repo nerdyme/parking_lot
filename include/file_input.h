@@ -1,17 +1,20 @@
+#pragma once
+
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "abstract_input.h"
 
-class FileInput {
+class FileInput : public AbstractInput {
 
 private :
-	ifstream fin;
+	std::ifstream fin;
 
 
 public :
 
-	FileInput(string input_filename) {
-		fin.open(input_filename, ios::in);
+	FileInput(std::string input_filename) {
+		fin.open(input_filename, std::ios::in);
 		if(!fin) {
 			std::cout << " Error in opening input file, Check and rerun \n";
 			exit(EXIT_FAILURE);
@@ -32,4 +35,4 @@ public :
 		fin.close();
 	}
 
-}
+};

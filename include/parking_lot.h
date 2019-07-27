@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <queue>
 
 struct carinfo {
         std::string registration_no;
@@ -12,12 +13,12 @@ struct carinfo {
         registration_no(registration_no), color(color), slot(slot) {}
     };
 
-    class ParkingLot {
+class ParkingLot {
 
         private:
 
         	const int lot_size{0};
-        	static ParkingLot *parking_lot {nullptr};
+        	static ParkingLot *parking_lot;
 
         //Create a min heap for empty parking lots 
         std::priority_queue <int, std::vector<int>, std::greater<int> > empty_lots;
@@ -41,7 +42,7 @@ struct carinfo {
         
         
 
-        static ParkingLot createParkingLot(int noOfParkingSlots) {
+        static ParkingLot* createParkingLot(int noOfParkingSlots) {
 			if(parking_lot != NULL) {
 				return parking_lot;
 			} else {
@@ -70,10 +71,21 @@ struct carinfo {
 				std::string reg_num = reg_ite->second;
 
 				alloted_slot_to_reg.erase(reg_ite);
-				reg_to_carinfo.erase(reg_num);
+
+				auto carinfo_ite = reg_to_carinfo.find(reg_num);
+				if(carinfo_ite == reg_to_carinfo.end()) {
+					std::cout<< " Something is wrong/inconsistent in the parking lot data you have" << std::endl;
+					return;
+				}
+
+				const auto carinf = carinfo_ite->second;
+
+				
 				//todo - erase from color_to_vinfo
+				color_to_vinfo[carinf.color].erase(slot);
 
 
+				reg_to_carinfo.erase(carinfo_ite);
 				empty_lots.push(slot);
 			}
 			
@@ -95,9 +107,9 @@ struct carinfo {
 
 			int allot_slot = empty_lots.top();
 			empty_lots.pop();
-			alloted_slot_to_reg.emplace({allot_slot, reg_num});
-			reg_to_carinfo.emplace({reg_num, carinfo(reg_num, color, allot_slot)});  //can use std::move to move carinfo object
-			//color_to_vinfo.emplace({color, {allot_slot, reg_num}}); //todo
+			alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
+			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));  //can use std::move to move carinfo object
+			//color_to_vinfo.emplace(std::make_pair(color, std::make_pair(allot_slot, reg_num))); //todo
 			
 
 
@@ -119,18 +131,41 @@ struct carinfo {
 
 		void slot_nums_with_color(std::string color) {
 
+			auto vinfo_ite = color_to_vinfo.find(color);
+			if (vinfo_ite == color_to_vinfo.end()) {
+				std::cout << " No car with the color "<<color << " is parked in the parking lot" << std::endl;
+				return;
+			}
+
+			/*for(auto vinfo : vinfo_ite) {
+					std::cout << vinfo->first <<" ";
+			}*/
+
 		}
 
 		void reg_nums_with_color(std::string color) {
+			auto vinfo_ite = color_to_vinfo.find(color);
+			if (vinfo_ite == color_to_vinfo.end()) {
+				std::cout << " No car with the color "<<color << " is parked in the parking lot" << std::endl;
+				return;
+			}
+
 
 		 }
 
 
+		 ~ParkingLot() {
+		 	//CLear all the dynamic memory allocated space
+		 	alloted_slot_to_reg.clear();
+        	reg_to_carinfo.clear();
+       		color_to_vinfo.clear();
 
-
-
-
+       		//todo - delete the static pointer objct pointed memory
+		 }
 
 
 
     };
+
+//Definition of static data member
+ParkingLot *ParkingLot::parking_lot = nullptr;
