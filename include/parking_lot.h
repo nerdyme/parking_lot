@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 #include <queue>
 
 struct carinfo {
@@ -23,7 +24,7 @@ class ParkingLot {
         //Create a min heap for empty parking lots 
         std::priority_queue <int, std::vector<int>, std::greater<int> > empty_lots;
 
-        std::unordered_map< int, std::string> alloted_slot_to_reg;
+        std::map< int, std::string> alloted_slot_to_reg;  //Take it as map as we need the status of each slot in sorted order
         std::unordered_map <std::string, carinfo> reg_to_carinfo;
         std::unordered_map <std::string, std::unordered_map<int, std::string> > color_to_vinfo; //vinfo is map of slot to reg_num
 
@@ -57,6 +58,27 @@ class ParkingLot {
 
 		void status() {
 
+			if (lot_size == 0) {
+				std::cout << "Sorry, parking lot is not created" << std::endl;
+
+			} else if (alloted_slot_to_reg.size() > 0) {
+				std::cout << "Slot No.\tRegistration No.\tColor"<<std::endl;
+				
+				for(const auto reg_num : alloted_slot_to_reg) {
+
+					auto reg_ite = reg_to_carinfo.find(reg_num.second);
+					if(reg_ite == reg_to_carinfo.end()) {
+						std::cout << "Something wrong/inconsistent in data structures used" <<std::endl; //debugging
+						return;
+					}
+
+					std::cout<<reg_ite->second.slot<<'\t' << reg_ite->second.registration_no << '\t' << reg_ite->second.color<< std::endl;
+				}
+				
+			} else {
+				std::cout << "Parking lot is empty" << std::endl;
+			}
+
 		}
 
 		void leave(int slot) {
@@ -74,7 +96,7 @@ class ParkingLot {
 
 				auto carinfo_ite = reg_to_carinfo.find(reg_num);
 				if(carinfo_ite == reg_to_carinfo.end()) {
-					std::cout<< " Something is wrong/inconsistent in the parking lot data you have" << std::endl;
+					std::cout<< " Something is wrong/inconsistent in the parking lot data you have" << std::endl; //debugging
 					return;
 				}
 
@@ -137,7 +159,7 @@ class ParkingLot {
 
 			auto vinfo_ite = color_to_vinfo.find(color);
 			if (vinfo_ite == color_to_vinfo.end()) {
-				std::cout << " No car with the color "<<color << " is parked in the parking lot" << std::endl;
+				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
 				return;
 			}
 
@@ -150,7 +172,7 @@ class ParkingLot {
 		void reg_nums_with_color(std::string color) {
 			auto vinfo_ite = color_to_vinfo.find(color);
 			if (vinfo_ite == color_to_vinfo.end()) {
-				std::cout << " No car with the color "<<color << " is parked in the parking lot" << std::endl;
+				std::cout << "No car with the color "<<color << " is parked in the parking lot" << std::endl;
 				return;
 			}
 
@@ -159,12 +181,11 @@ class ParkingLot {
 
 
 		 ~ParkingLot() {
+
 		 	//CLear all the dynamic memory allocated space
 		 	alloted_slot_to_reg.clear();
         	reg_to_carinfo.clear();
        		color_to_vinfo.clear();
-
-       		//todo - delete the static pointer objct pointed memory
 		 }
 
 
