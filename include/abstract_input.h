@@ -31,18 +31,18 @@ public :
 	    }
 
 	    int cmd_args = tokens.size();
+	    //std::cout<< cmd_args << std::endl; //debug
 
 
-
-	    if(cmd_args <= 1) {
-	    	std::cout << "Wrong input of command" <<'\n';
+	    if(cmd_args < 1) {
+	    	std::cout << "No input of command" <<'\n';
 	    	exit(EXIT_FAILURE);
 
 	    } 
 	    std::string command = tokens[0];
 
 
-	    if (command.compare("create_parking_lot")) {  //Create
+	    if (!command.compare("create_parking_lot")) {  //Create
 
 	    		if(cmd_args != 2) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -52,7 +52,7 @@ public :
 			parking_lot = ParkingLot::createParkingLot(noOfParkingSlots);
 			
 
-	    } else if (command.compare("park")) {  //Park
+	    } else if (!command.compare("park")) {  //Park
 
 	    	if(cmd_args != 3) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -70,7 +70,7 @@ public :
 			}
 			
 
-	    } else if (command.compare("leave")) { //leave
+	    } else if (!command.compare("leave")) { //leave
 
 	    	if(cmd_args != 2) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -87,7 +87,7 @@ public :
 			}
 			
 
-	    } else if (command.compare("status")) {    //Status
+	    } else if (!command.compare("status")) {    //Status
 
 	    	if(cmd_args != 1) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -103,7 +103,7 @@ public :
 			}
 			
 
-	    } else if (command.compare("registration_numbers_for_cars_with_colour")) {
+	    } else if (!command.compare("registration_numbers_for_cars_with_colour")) {
 
 	    	if(cmd_args != 2) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -119,7 +119,7 @@ public :
 			}
 			
 
-	    } else if (command.compare("slot_numbers_for_cars_with_colour")) {
+	    } else if (!command.compare("slot_numbers_for_cars_with_colour")) {
 
 	    	if(cmd_args != 2) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -135,7 +135,7 @@ public :
 			}
 		
 
-	    } else if (command.compare("slot_number_for_registration_number")) {
+	    } else if (!command.compare("slot_number_for_registration_number")) {
 
 	    	if(cmd_args != 2) {
 				std::cout <<  "Invalid no of arguments for command : " << command << std::endl;
@@ -150,6 +150,11 @@ public :
 				exit(EXIT_FAILURE);	
 			}
 		
+
+	    } else if(!command.compare("exit")) {
+	    	
+	    	delete parking_lot; //Free up dynamic space allocations
+	    	exit(EXIT_SUCCESS);
 
 	    } else {
 

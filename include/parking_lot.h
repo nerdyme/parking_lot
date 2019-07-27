@@ -87,6 +87,8 @@ class ParkingLot {
 
 				reg_to_carinfo.erase(carinfo_ite);
 				empty_lots.push(slot);
+
+				std::cout<<"Slot number "<<slot<<" is free"<<std::endl;
 			}
 			
 
@@ -101,15 +103,17 @@ class ParkingLot {
 			}
 
 			if(empty_lots.size() == 0) {
-				std::cout<< " Parking Lot is full, Sorry No space"<<std::endl;
+				std::cout<< "Sorry, parking lot is full"<<std::endl;
 				return;
 			}
 
-			int allot_slot = empty_lots.top();
+			int allot_slot = empty_lots.top(); //Will always give minimum available slot as it is priority queue implemented using heaps
 			empty_lots.pop();
 			alloted_slot_to_reg.emplace(std::make_pair(allot_slot, reg_num));
 			reg_to_carinfo.emplace(std::make_pair(reg_num, std::move(carinfo(reg_num, color, allot_slot))));  //can use std::move to move carinfo object
 			//color_to_vinfo.emplace(std::make_pair(color, std::make_pair(allot_slot, reg_num))); //todo
+
+			std::cout<<"Allocated slot number: "<<allot_slot <<std::endl;
 			
 
 
