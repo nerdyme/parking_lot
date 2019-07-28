@@ -3,6 +3,7 @@
 	#include <unordered_map>
 	#include <map>
 	#include <queue>
+    #include <iomanip>
 
 	struct carinfo {
 	        std::string registration_no;
@@ -59,11 +60,12 @@
 
 			void status() {
 
+				std::setiosflags(std::ios::right);
 				if (lot_size == 0) {
 					std::cout << "Sorry, parking lot is not created" << std::endl;
 
 				} else if (alloted_slot_to_reg.size() > 0) {
-					std::cout << "Slot No.\tRegistration No.\tColor"<<std::endl;
+					std::cout <<"Slot No." << std::setw(19) << "Registration No" <<std::setw(10) << "Colour"<<std::endl;
 					
 					for(const auto reg_num : alloted_slot_to_reg) {
 
@@ -73,8 +75,8 @@
 							return;
 						}
 
-						std::cout<<reg_ite->second.slot<<'\t' << reg_ite->second.registration_no
-						 << '\t' << reg_ite->second.color<< std::endl;
+						std::cout<< reg_ite->second.slot << std::setw(24) << reg_ite->second.registration_no
+						  << std::setw(11) << reg_ite->second.color<< std::endl;
 					}
 					
 				} else {

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdio>
-#include "abstract_input.h"
 #include "command_input.h"
 #include "file_input.h"
 
@@ -34,10 +33,6 @@ if(argc == 1) { //Command Mode
 	exit(EXIT_FAILURE);
 }
 
-
 input->read();
-
 return 1;
-
-
 }
